@@ -14,6 +14,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod base64;
+
 pub mod encode;
 pub mod types;
 
