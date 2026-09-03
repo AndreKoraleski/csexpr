@@ -59,3 +59,9 @@ pub mod encode;
 pub mod types;
 
 pub use crate::types::{Atom, Sexp};
+
+/// The examples in the README, compiled and run along with the rest of the
+/// documentation so that they cannot quietly stop working.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct Readme;

@@ -7,5 +7,9 @@ description = "S-expressions as specified by RFC 9804"
 license = "MIT"
 keywords = ["sexp", "s-expression", "rfc9804", "csexp", "spki"]
 categories = ["encoding", "parser-implementations", "data-structures"]
+repository = "https://github.com/AndreKoraleski/csexpr"
+documentation = "https://docs.rs/csexpr"
+readme = "README.md"
+exclude = [".github", "bindings", "fuzz", "mutants.toml"]
 
 [dependencies]
