@@ -3,6 +3,7 @@
 [![CI](https://github.com/AndreKoraleski/csexpr/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreKoraleski/csexpr/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/csexpr.svg)](https://crates.io/crates/csexpr)
 [![docs.rs](https://img.shields.io/docsrs/csexpr)](https://docs.rs/csexpr)
+[![PyPI](https://img.shields.io/pypi/v/csexpr.svg)](https://pypi.org/project/csexpr/)
 [![MIT](https://img.shields.io/crates/l/csexpr.svg)](LICENSE)
 
 S-expressions, as specified by [RFC 9804]. The name is short for canonical
@@ -81,6 +82,26 @@ assert!(parser.parse(b"(issuer bob)").is_err());
   depends on what that language needs and nothing more.
 - No `unsafe` code, which `#![forbid(unsafe_code)]` keeps true.
 - Minimum supported Rust version 1.85, raised only in a minor release.
+
+## Python
+
+The same library, bound to Python, lives in [bindings/python](bindings/python).
+The parsing and the writing happen in Rust either way.
+
+```sh
+pip install csexpr
+```
+
+```python
+import csexpr
+
+assert csexpr.to_canonical(["issuer", "bob"]) == b"(6:issuer3:bob)"
+assert csexpr.parse(b"(6:issuer3:bob)") == [b"issuer", b"bob"]
+```
+
+A Python value stands for an S-expression directly. `bytes` is an octet
+string, a `list` is a list, and `Atom` is an octet string that carries a
+display hint. The rest is in [its own README](bindings/python/README.md).
 
 ## Contributing
 

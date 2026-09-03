@@ -8,6 +8,14 @@ release, and is noted here whenever it happens.
 
 ## [Unreleased]
 
+### Added
+
+- Python bindings, published to PyPI as `csexpr`. A Python value stands for an
+  S-expression directly, so `bytes` is an octet string, a `list` is a list,
+  and `Atom` is an octet string that carries a display hint. Everything the
+  Rust library reads and writes is reachable, restrictions included, and the
+  package is typed.
+
 ## [0.1.0]
 
 First release.

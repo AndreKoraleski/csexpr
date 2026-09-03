@@ -53,6 +53,30 @@ cargo mutants
 cargo +nightly fuzz run parse
 ```
 
+## The Python bindings
+
+The library is the whole of what the bindings carry, so a change to behaviour
+belongs in `src` and the binding follows it. `bindings/python` holds only the
+conversions between a Python value and a `Sexp`, and the classes and functions
+that carry them across.
+
+They are built and tested with their own tools, from `bindings/python`.
+
+```sh
+uv venv
+uv pip install maturin pytest ruff mypy
+uv run maturin develop
+uv run pytest
+uv run ruff format .
+uv run ruff check .
+uv run mypy .
+```
+
+The same standard holds on that side of the boundary. Everything public is
+documented and annotated, `ruff` formats and lints it, and `mypy` checks it
+under `strict`. The type stubs in `python/csexpr/_csexpr.pyi` are written by
+hand, so a change to a signature in Rust belongs there in the same commit.
+
 ## Commits
 
 One concept per commit, and a subject line of the form `type: what changed`,
@@ -62,10 +86,13 @@ subject already describes.
 ## Releasing
 
 1. Move the entries under `Unreleased` in `CHANGELOG.md` to a new version.
-2. Set the version in `Cargo.toml`, and commit.
+2. Set the version in `Cargo.toml` and in `bindings/python/Cargo.toml`, which
+   is where the Python package takes its version from, and commit.
 3. Tag it `vX.Y.Z` and push the tag.
 
-Pushing the tag publishes the crate. The workflow refuses a tag that disagrees
-with the manifest or names a version the changelog does not mention.
+Pushing the tag publishes the crate to crates.io and the wheels to PyPI, both
+through Trusted Publishing, so neither registry needs a token stored here. The
+workflow refuses a tag that disagrees with either manifest, that names a
+version the changelog does not mention, or whose tests do not pass.
 
 [RFC 9804]: https://www.rfc-editor.org/rfc/rfc9804.html
