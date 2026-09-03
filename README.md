@@ -103,6 +103,9 @@ A Python value stands for an S-expression directly. `bytes` is an octet
 string, a `list` is a list, and `Atom` is an octet string that carries a
 display hint. The rest is in [its own README](bindings/python/README.md).
 
+The wheels are built against the stable ABI, so one per platform serves every
+Python from 3.10 up.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). To report something that looks like a

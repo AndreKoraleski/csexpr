@@ -10,6 +10,9 @@ and the writing happen in Rust, and no Python code stands between them and you.
 
 ## Install
 
+Python 3.10 or later. One wheel per platform serves every version of it, since
+the extension is built against the stable ABI.
+
 ```sh
 pip install csexpr
 ```
