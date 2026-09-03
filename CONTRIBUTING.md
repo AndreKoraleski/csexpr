@@ -53,6 +53,13 @@ cargo mutants
 cargo +nightly fuzz run parse
 ```
 
+A mutant that survives is a place where the code could be wrong and no test
+would say so. What cargo-mutants reads is `.cargo/mutants.toml`, which leaves
+out the handful of mutants that cannot change behaviour and says of each why
+it cannot, so that anything a run reports is worth reading. A mutant that only
+stops a loop making progress is caught by the suite never finishing, and is
+reported apart from the rest.
+
 ## The Python bindings
 
 The library is the whole of what the bindings carry, so a change to behaviour
@@ -86,13 +93,17 @@ subject already describes.
 ## Releasing
 
 1. Move the entries under `Unreleased` in `CHANGELOG.md` to a new version.
-2. Set the version in `Cargo.toml` and in `bindings/python/Cargo.toml`, which
-   is where the Python package takes its version from, and commit.
+2. Raise `version` under `[workspace.package]` in `Cargo.toml`, which is the
+   one place it is written, and commit.
 3. Tag it `vX.Y.Z` and push the tag.
 
 Pushing the tag publishes the crate to crates.io and the wheels to PyPI, both
 through Trusted Publishing, so neither registry needs a token stored here. The
-workflow refuses a tag that disagrees with either manifest, that names a
-version the changelog does not mention, or whose tests do not pass.
+workflow refuses a tag that disagrees with the manifest, that names a version
+the changelog does not mention, or whose tests do not pass.
+
+[RELEASING.md](RELEASING.md) has the rest, including what has to be set up at
+each registry before the first release and what to do when a release fails
+halfway.
 
 [RFC 9804]: https://www.rfc-editor.org/rfc/rfc9804.html
