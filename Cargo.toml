@@ -2,5 +2,10 @@
 name = "sexp"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+description = "S-expressions as specified by RFC 9804"
+license = "MIT OR Apache-2.0"
+keywords = ["sexp", "s-expression", "rfc9804", "spki", "canonical"]
+categories = ["encoding", "parser-implementations", "data-structures"]
 
 [dependencies]

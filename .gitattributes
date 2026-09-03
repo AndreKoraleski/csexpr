@@ -1,0 +1,6 @@
+# Normalize line endings so a checkout is identical on every platform.
+* text=auto eol=lf
+
+# Never rewrite bytes that are not text.
+*.png binary
+*.bin binary
