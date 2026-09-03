@@ -388,6 +388,32 @@ mod tests {
     }
 
     #[test]
+    fn writer_flushes_the_writer_beneath_it() {
+        struct Counting {
+            flushes: usize,
+        }
+
+        impl io::Write for Counting {
+            fn write(&mut self, octets: &[u8]) -> io::Result<usize> {
+                Ok(octets.len())
+            }
+
+            fn flush(&mut self) -> io::Result<()> {
+                self.flushes += 1;
+
+                Ok(())
+            }
+        }
+
+        let mut writer = Writer::new(Counting { flushes: 0 });
+
+        writer.write_all(b"foo").unwrap();
+        writer.flush().unwrap();
+
+        assert_eq!(writer.inner.flushes, 1);
+    }
+
+    #[test]
     fn writer_reports_a_failure_of_the_writer() {
         struct Full;
 
