@@ -1,0 +1,33 @@
+name: Feature request
+description: Something the crate should be able to do and cannot
+labels: [enhancement]
+
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you are trying to do
+      description: >
+        What the crate makes hard or impossible today, and what you have to do
+        instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: shape
+    attributes:
+      label: What it might look like
+      description: The API you would want to call, if you have one in mind.
+      render: rust
+    validations:
+      required: false
+
+  - type: input
+    id: section
+    attributes:
+      label: Section of RFC 9804
+      description: >
+        Which part of the specification this comes from, if it comes from one.
+      placeholder: "§4.6"
+    validations:
+      required: false

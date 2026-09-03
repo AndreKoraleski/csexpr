@@ -1,0 +1,17 @@
+version: 2
+
+updates:
+  # The crate itself has no dependencies. These are the two places that do.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: cargo
+    directory: /fuzz
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"

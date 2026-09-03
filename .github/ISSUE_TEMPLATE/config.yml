@@ -1,0 +1,12 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: Security report
+    url: https://github.com/AndreKoraleski/csexpr/security/advisories/new
+    about: >
+      Report a panic, unbounded memory, or anything that would undermine a
+      signature over a canonical representation. Do not open a public issue.
+
+  - name: RFC 9804
+    url: https://www.rfc-editor.org/rfc/rfc9804.html
+    about: The specification this crate implements.

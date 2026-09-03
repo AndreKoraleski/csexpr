@@ -1,0 +1,53 @@
+name: Bug report
+description: Something behaves differently from what it says it does
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If this looks like a security problem, report it through Security
+        instead, as [SECURITY.md](../blob/master/SECURITY.md) describes.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce it
+      description: >
+        The shortest code or input that shows it. Octets that are not text are
+        easiest to read as an escaped byte string.
+      render: rust
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version of csexpr
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: rust
+    attributes:
+      label: Version of Rust
+      description: The output of `rustc --version`.
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      placeholder: Linux, macOS, Windows
+    validations:
+      required: false
