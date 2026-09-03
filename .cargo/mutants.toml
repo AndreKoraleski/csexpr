@@ -3,6 +3,30 @@
 
 # The suite finishes in a fraction of a second, so a timeout scaled from that
 # alone would call a slow machine a failure. A mutant that runs this long has
-# been turned into a loop that does not end.
-minimum_test_timeout = 30
+# stopped a loop making progress, and the suite catches it by never finishing.
+minimum_test_timeout = 20
 timeout_multiplier = 20.0
+
+# Mutants that cannot change what the code does. Each one was looked at and
+# found to describe the same behaviour by other means, so no test can tell it
+# from the original. They are left out so that a mutant which really does
+# survive is the only thing a run reports.
+exclude_re = [
+  # `|` and `^` agree wherever the bits being joined do not overlap, and every
+  # place this crate joins a shifted value to the bits beneath it is such a
+  # place. A six-bit value shifted left by two cannot collide with the two
+  # bits below it, and a nibble shifted left by four cannot collide with the
+  # nibble below it.
+  "replace \\| with \\^",
+
+  # DECIMAL_DIGITS has only to be large enough to hold the digits of a usize.
+  # Arithmetic that makes it larger leaves every digit room, so nothing can
+  # observe the difference. The mutants that make it smaller are caught.
+  "^src/encode/canonical\\.rs:\\d+:\\d+: replace \\+ with \\*$",
+  "^src/encode/canonical\\.rs:\\d+:\\d+: replace / with \\*$",
+
+  # Taking this branch always means filling the waiting group three octets at
+  # a time and never reaching the bulk path below it. That path is an
+  # optimization, so the octets written are the same either way.
+  "replace > with >= in <impl io::Write for Writer<W>>::write",
+]

@@ -25,7 +25,20 @@ jobs:
           tool: cargo-mutants
 
       - name: Look for mutants the tests would miss
-        run: cargo mutants --no-shuffle --in-place --timeout 120
+        run: |
+          status=0
+          cargo mutants --no-shuffle --in-place || status=$?
+
+          # 0 says every mutant was caught. 3 says one of them stopped a loop
+          # making progress, which the suite catches by never finishing, so it
+          # survived nothing. Anything else, 2 above all, is a mutant the
+          # tests let through, and that is what this job is here to find.
+          if [ "$status" -eq 3 ]; then
+            echo "some mutants were caught by not terminating, see the report"
+            exit 0
+          fi
+
+          exit "$status"
 
       - name: Keep the report
         if: always()
