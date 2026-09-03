@@ -1,16 +1,16 @@
 [package]
 name = "csexpr"
-version = "0.1.0"
-edition = "2024"
-rust-version = "1.85"
 description = "S-expressions as specified by RFC 9804"
-license = "MIT"
 keywords = ["sexp", "s-expression", "rfc9804", "csexp", "spki"]
 categories = ["encoding", "parser-implementations", "data-structures"]
-repository = "https://github.com/AndreKoraleski/csexpr"
 documentation = "https://docs.rs/csexpr"
 readme = "README.md"
-exclude = [".github", "bindings", "fuzz", "mutants.toml"]
+exclude = [".cargo", ".github", "bindings", "fuzz"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 
@@ -20,3 +20,12 @@ exclude = [".github", "bindings", "fuzz", "mutants.toml"]
 members = ["bindings/python"]
 default-members = ["."]
 resolver = "3"
+
+# What a release has to agree on lives here, so that raising a version is one
+# line rather than one line for every package that carries it.
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/AndreKoraleski/csexpr"

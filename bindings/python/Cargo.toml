@@ -1,12 +1,12 @@
 [package]
 name = "csexpr-python"
-version = "0.1.0"
-edition = "2024"
-rust-version = "1.85"
 description = "Python bindings for csexpr"
-license = "MIT"
-repository = "https://github.com/AndreKoraleski/csexpr"
 publish = false
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [lib]
 name = "_csexpr"
