@@ -13,6 +13,10 @@ crates.io has no pending publisher, so a crate has to exist before a trusted
 publisher can be attached to it. Version 0.1.0 therefore goes up by hand, and
 every version after it goes up by tag.
 
+This is the one release nothing guards, since the workflow is not the thing
+doing it. Look at the Actions tab first and see that CI is green on the commit
+you are about to publish, because crates.io will not let you take it back.
+
 1. Make a token at <https://crates.io/settings/tokens>, scoped to
    `publish-new` and `publish-update`, with the shortest expiry that suits.
 2. Run `cargo login` and give it the token.
@@ -86,11 +90,21 @@ output gets signed, and it costs one click per release.
 
 ## What the tag sets off
 
-The workflow refuses the tag unless the version in the manifest, the version
-the tag names, and a heading in the changelog all agree, and unless the tests
-pass. After that it publishes the crate, builds a wheel on Linux, macOS and
-Windows along with a source distribution, uploads them to PyPI, and drafts the
-release notes on GitHub.
+Nothing is published unless the tag is green. The release runs the whole of CI
+against the tagged commit, which is the same workflow a push to `master` runs
+and not a copy of part of it. That is tests on Linux, macOS and Windows, the
+documentation examples, clippy, rustfmt, a build against the oldest supported
+Rust, `cargo package`, and the Python bindings built and tested on all three
+platforms along with `ruff` and `mypy`. Alongside it, the tag itself is checked
+against the version in the manifest and against a heading in the changelog.
+
+Only once all of that passes does anything leave the machine. Then it publishes
+the crate, builds a wheel on Linux, macOS and Windows along with a source
+distribution, uploads them to PyPI, and drafts the release notes on GitHub.
+
+Mutation testing and fuzzing do not gate a release. They run on a schedule,
+take far longer than a release should wait, and answer a different question,
+which is whether the tests are worth trusting rather than whether they pass.
 
 One wheel per platform serves every Python from 3.10 up, since the extension
 is built against the stable ABI.

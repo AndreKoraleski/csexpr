@@ -120,9 +120,11 @@ subject already describes.
 3. Tag it `vX.Y.Z` and push the tag.
 
 Pushing the tag publishes the crate to crates.io and the wheels to PyPI, both
-through Trusted Publishing, so neither registry needs a token stored here. The
-workflow refuses a tag that disagrees with the manifest, that names a version
-the changelog does not mention, or whose tests do not pass.
+through Trusted Publishing, so neither registry needs a token stored here.
+Nothing is published unless the tag is green, since the release runs the whole
+of CI against the tagged commit before it publishes anything. It also refuses a
+tag that disagrees with the manifest or names a version the changelog does not
+mention.
 
 [RELEASING.md](RELEASING.md) has the rest, including what has to be set up at
 each registry before the first release and what to do when a release fails
