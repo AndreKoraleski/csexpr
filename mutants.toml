@@ -1,0 +1,8 @@
+# Settings for cargo-mutants, which asks whether the tests would notice if the
+# code were wrong.
+
+# The suite finishes in a fraction of a second, so a timeout scaled from that
+# alone would call a slow machine a failure. A mutant that runs this long has
+# been turned into a loop that does not end.
+minimum_test_timeout = 30
+timeout_multiplier = 20.0

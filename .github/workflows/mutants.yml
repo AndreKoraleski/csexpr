@@ -1,0 +1,35 @@
+name: Mutants
+
+# Mutation testing asks whether the tests would notice if the code were wrong,
+# which a line count cannot. It takes far longer than the test suite, so it
+# runs on a schedule rather than on every push.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  mutants:
+    name: Mutation testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants
+
+      - name: Look for mutants the tests would miss
+        run: cargo mutants --no-shuffle --in-place --timeout 120
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutants
+          path: mutants.out

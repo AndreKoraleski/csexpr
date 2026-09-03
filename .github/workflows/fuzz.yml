@@ -1,0 +1,49 @@
+name: Fuzz
+
+# The parser is meant to face input from anywhere, so it is worth throwing
+# input from anywhere at it. A run that finds nothing proves nothing, which is
+# why this runs again every week rather than once.
+on:
+  schedule:
+    - cron: "0 6 * * 2"
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: How long to run each target for
+        required: false
+        default: "600"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fuzz:
+    name: Fuzz ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [parse, canonical]
+    steps:
+      - uses: actions/checkout@v4
+      # cargo-fuzz builds with sanitizer support, which needs nightly.
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fuzz
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+
+      - name: Fuzz
+        run: |
+          cargo fuzz run ${{ matrix.target }} -- \
+            -max_total_time=${{ inputs.seconds || 600 }} \
+            -max_len=4096
+
+      - name: Keep whatever broke it
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.target }}
+          path: fuzz/artifacts
