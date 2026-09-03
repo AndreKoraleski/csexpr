@@ -37,13 +37,12 @@ impl Atom {
     #[new]
     #[pyo3(signature = (data, hint = None))]
     fn new(data: Octets, hint: Option<Octets>) -> Self {
-        let atom = csexpr::Atom::new(data.0);
+        // The octets were built here, so they are handed over rather than
+        // lent and copied.
+        let hint = hint.map(|hint| hint.0.into());
 
         Self {
-            inner: match hint {
-                Some(hint) => atom.with_hint(hint.0),
-                None => atom,
-            },
+            inner: csexpr::Atom::from_parts(data.0.into(), hint),
         }
     }
 
