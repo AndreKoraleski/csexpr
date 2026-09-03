@@ -4,7 +4,7 @@
 [![crates.io](https://img.shields.io/crates/v/csexpr.svg)](https://crates.io/crates/csexpr)
 [![docs.rs](https://img.shields.io/docsrs/csexpr)](https://docs.rs/csexpr)
 [![PyPI](https://img.shields.io/pypi/v/csexpr.svg)](https://pypi.org/project/csexpr/)
-[![MIT](https://img.shields.io/crates/l/csexpr.svg)](LICENSE)
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 S-expressions, as specified by [RFC 9804]. The name is short for canonical
 S-expression, which is what this format has long been called after the one

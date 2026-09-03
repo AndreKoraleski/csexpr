@@ -8,14 +8,6 @@ release, and is noted here whenever it happens.
 
 ## [Unreleased]
 
-### Added
-
-- Python bindings, published to PyPI as `csexpr`. A Python value stands for an
-  S-expression directly, so `bytes` is an octet string, a `list` is a list,
-  and `Atom` is an octet string that carries a display hint. Everything the
-  Rust library reads and writes is reachable, restrictions included, and the
-  package is typed.
-
 ## [0.1.0]
 
 First release.
@@ -33,6 +25,11 @@ First release.
   the depth of nesting, the length of an octet string and the size of the
   input.
 - `decode::Error`, saying what was wrong and at which octet.
+- Python bindings, published to PyPI as `csexpr`. A Python value stands for an
+  S-expression directly, so `bytes` is an octet string, a `list` is a list,
+  and `Atom` is an octet string that carries a display hint. Everything the
+  Rust library reads and writes is reachable, restrictions included, and the
+  package is typed.
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.1.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
