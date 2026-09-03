@@ -6,10 +6,15 @@
 //! representation-independent values, which the modules around them read and
 //! write in the representations §6 gives.
 //!
+//! [`encode`] writes an S-expression in the canonical representation of §6.2,
+//! the basic transport representation of §6.3, or the advanced representation
+//! of §6.4.
+//!
 //! [RFC 9804]: https://www.rfc-editor.org/rfc/rfc9804.html
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod encode;
 pub mod types;
 
 pub use crate::types::{Atom, Sexp};
