@@ -93,7 +93,7 @@ They are built and tested with their own tools, from `bindings/python`.
 
 ```sh
 uv venv
-uv pip install maturin pytest ruff mypy
+uv pip install --group dev
 uv run maturin develop
 uv run pytest
 uv run ruff format .
