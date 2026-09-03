@@ -60,6 +60,28 @@ it cannot, so that anything a run reports is worth reading. A mutant that only
 stops a loop making progress is caught by the suite never finishing, and is
 reported apart from the rest.
 
+Fuzzing wants Linux or macOS. cargo-fuzz links against libFuzzer, and the MSVC
+linker has nothing to satisfy it with, so on Windows it fails to link whether
+or not a sanitizer is asked for. The scheduled run covers it either way, and
+WSL covers it by hand.
+
+## Benchmarks
+
+```sh
+cargo bench
+```
+
+The shapes measured are in `benches/common`, and each stands for something
+that turns up in practice rather than something that flatters a number. A
+certificate of the kind SPKI puts in one, octet strings that carry display
+hints, a wide list, one large octet string, and lists nested as deeply as a
+parser accepts.
+
+The harness counts allocations as well as time, which is usually the number
+that matters here, since reading and writing are mostly a question of how much
+gets copied. Measure before changing anything for speed, and say in the pull
+request what the measurement was.
+
 ## The Python bindings
 
 The library is the whole of what the bindings carry, so a change to behaviour
