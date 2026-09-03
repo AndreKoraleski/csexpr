@@ -43,7 +43,7 @@ pub const DEFAULT_MAX_DEPTH: usize = 1024;
 /// # Examples
 ///
 /// ```
-/// use sexp::{decode::Parser, sexp};
+/// use csexpr::{decode::Parser, sexp};
 ///
 /// let parser = Parser::new();
 /// let expected = sexp!["issuer", "bob"];

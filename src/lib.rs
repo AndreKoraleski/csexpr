@@ -1,5 +1,9 @@
 //! S-expressions, as specified by [RFC 9804].
 //!
+//! The name is short for canonical S-expression, which is what this format has
+//! long been called after the one representation of it that is unique, and by
+//! which it is known where it is used, as in SPKI and SDSI.
+//!
 //! An S-expression is either an octet string or a list of simpler
 //! S-expressions (§2). [`Atom`] is the octet string, carrying the optional
 //! display hint of §4.6, and [`Sexp`] is the S-expression itself. Both are
@@ -17,7 +21,7 @@
 //! # Examples
 //!
 //! ```
-//! use sexp::{Atom, decode, encode::canonical, sexp};
+//! use csexpr::{Atom, decode, encode::canonical, sexp};
 //!
 //! let cert = sexp!["issuer", Atom::new("bob").with_hint("text/plain")];
 //! let written = canonical::to_vec(&cert);

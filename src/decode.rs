@@ -37,7 +37,7 @@ use crate::types::Sexp;
 /// # Examples
 ///
 /// ```
-/// use sexp::{decode, sexp};
+/// use csexpr::{decode, sexp};
 ///
 /// assert_eq!(
 ///     decode::parse(b"(6:issuer3:bob)").unwrap(),
@@ -66,7 +66,7 @@ pub fn parse(input: &[u8]) -> Result<Sexp, Error> {
 /// # Examples
 ///
 /// ```
-/// use sexp::{decode, sexp};
+/// use csexpr::{decode, sexp};
 ///
 /// assert_eq!(
 ///     decode::parse_canonical(b"(6:issuer3:bob)").unwrap(),

@@ -56,7 +56,7 @@ const ESCAPED: &[(u8, char)] = &[
 /// # Examples
 ///
 /// ```
-/// use sexp::{Atom, Sexp, encode::advanced, sexp};
+/// use csexpr::{Atom, Sexp, encode::advanced, sexp};
 ///
 /// let cert = sexp!["issuer", Atom::new("bob").with_hint("text/plain")];
 ///

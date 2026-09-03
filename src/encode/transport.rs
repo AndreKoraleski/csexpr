@@ -33,7 +33,7 @@ use crate::types::Sexp;
 /// # Examples
 ///
 /// ```
-/// use sexp::{encode::transport, sexp};
+/// use csexpr::{encode::transport, sexp};
 ///
 /// let cert = sexp!["issuer", "bob"];
 ///

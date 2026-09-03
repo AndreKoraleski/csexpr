@@ -1,11 +1,11 @@
 [package]
-name = "sexp"
+name = "csexpr"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 description = "S-expressions as specified by RFC 9804"
 license = "MIT"
-keywords = ["sexp", "s-expression", "rfc9804", "spki", "canonical"]
+keywords = ["sexp", "s-expression", "rfc9804", "csexp", "spki"]
 categories = ["encoding", "parser-implementations", "data-structures"]
 
 [dependencies]

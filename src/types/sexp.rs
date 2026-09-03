@@ -326,7 +326,7 @@ impl Extend<Sexp> for Sexp {
 /// # Examples
 ///
 /// ```
-/// use sexp::{Sexp, sexp};
+/// use csexpr::{Sexp, sexp};
 ///
 /// let cert = sexp!["issuer", sexp!["name", "bob"], sexp![]];
 ///

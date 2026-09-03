@@ -33,7 +33,7 @@ const DECIMAL_DIGITS: usize = usize::BITS as usize / 3 + 2;
 /// # Examples
 ///
 /// ```
-/// use sexp::{Atom, Sexp, encode::canonical, sexp};
+/// use csexpr::{Atom, Sexp, encode::canonical, sexp};
 ///
 /// let cert = sexp!["issuer", Atom::new("bob").with_hint("text/plain")];
 ///
