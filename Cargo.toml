@@ -14,6 +14,19 @@ repository.workspace = true
 
 [dependencies]
 
+# Nothing here reaches whoever depends on this crate. A benchmark harness is
+# the only thing the library itself is built alongside.
+[dev-dependencies]
+divan = "0.1"
+
+[[bench]]
+name = "decode"
+harness = false
+
+[[bench]]
+name = "encode"
+harness = false
+
 # The library itself has no dependencies. The bindings that carry it to other
 # languages do, and each is a member of its own, built only when asked for.
 [workspace]
