@@ -12,6 +12,10 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 
+# The test harness is not a benchmark, and running it as one is only noise.
+[lib]
+bench = false
+
 [dependencies]
 
 # Nothing here reaches whoever depends on this crate. A benchmark harness is
