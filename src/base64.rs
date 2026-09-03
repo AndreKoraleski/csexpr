@@ -9,6 +9,8 @@
 
 use std::io;
 
+use crate::syntax;
+
 /// The standard alphabet of RFC 4648 §4, in value order.
 const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -45,6 +47,125 @@ fn encode_group(group: &[u8]) -> [u8; 4] {
     }
 
     characters
+}
+
+/// Decodes base 64, passing over the whitespace §4.5 and §6.1 allow inside it.
+///
+/// Returns the offset within `input` of the character that made decoding
+/// impossible, or the length of `input` where the encoding ended in the middle
+/// of a group.
+///
+/// The bits an encoder leaves zero in the last character of a group that is
+/// not whole have to be zero here as well. Anything else would give one octet
+/// string two encodings, which a representation that gets signed cannot
+/// afford. Padding is required to fill the group it appears in, and, as RFC
+/// 4648 §3.2 allows, an encoding that stops on a group boundary without
+/// padding is accepted.
+pub(crate) fn decode(input: &[u8]) -> Result<Vec<u8>, usize> {
+    let mut out = Vec::with_capacity(input.len() / 4 * 3);
+    let mut group = [0u8; 4];
+    let mut len = 0;
+    let mut padding = 0;
+    let mut last = 0;
+    let mut ended = false;
+
+    for (offset, &character) in input.iter().enumerate() {
+        if syntax::is_whitespace(character) {
+            continue;
+        }
+
+        if ended {
+            return Err(offset);
+        }
+
+        if character == b'=' {
+            // Padding stands in for the characters a whole group would have
+            // had, and two characters are the fewest that stand for an octet.
+            if len + padding < 2 {
+                return Err(offset);
+            }
+
+            padding += 1;
+
+            if len + padding == 4 {
+                decode_group(&group[..len], &mut out, last)?;
+                len = 0;
+                padding = 0;
+                ended = true;
+            }
+
+            continue;
+        }
+
+        if padding > 0 {
+            return Err(offset);
+        }
+
+        group[len] = value_of(character).ok_or(offset)?;
+        len += 1;
+        last = offset;
+
+        if len == 4 {
+            decode_group(&group, &mut out, last)?;
+            len = 0;
+        }
+    }
+
+    if padding > 0 {
+        return Err(input.len());
+    }
+
+    decode_group(&group[..len], &mut out, last)?;
+
+    Ok(out)
+}
+
+/// Decodes one group of two to four characters into one to three octets.
+///
+/// A group of one character stands for no octet at all, and one of none is
+/// what a whole encoding ends on, so the first is an error and the second is
+/// nothing to do. The offset is where to report either failure.
+fn decode_group(group: &[u8], out: &mut Vec<u8>, offset: usize) -> Result<(), usize> {
+    match *group {
+        [] => {}
+        [first, second] => {
+            if second & 0x0f != 0 {
+                return Err(offset);
+            }
+
+            out.push((first << 2) | (second >> 4));
+        }
+        [first, second, third] => {
+            if third & 0x03 != 0 {
+                return Err(offset);
+            }
+
+            out.push((first << 2) | (second >> 4));
+            out.push((second << 4) | (third >> 2));
+        }
+        [first, second, third, fourth] => {
+            out.push((first << 2) | (second >> 4));
+            out.push((second << 4) | (third >> 2));
+            out.push((third << 6) | fourth);
+        }
+        _ => return Err(offset),
+    }
+
+    Ok(())
+}
+
+/// Returns what one base-64 character is worth.
+fn value_of(character: u8) -> Option<u8> {
+    let value = match character {
+        b'A'..=b'Z' => character - b'A',
+        b'a'..=b'z' => character - b'a' + 26,
+        b'0'..=b'9' => character - b'0' + 52,
+        b'+' => 62,
+        b'/' => 63,
+        _ => return None,
+    };
+
+    Some(value)
 }
 
 /// A writer that encodes in base 64 whatever is written to it.
@@ -285,5 +406,114 @@ mod tests {
         assert!(writer.write_all(b"foo").is_err());
         assert!(Writer::new(Full).write_all(b"f").is_ok());
         assert!(Writer::new(Full).finish().is_ok());
+    }
+
+    // decode
+
+    #[test]
+    fn decode_reads_back_the_rfc_4648_test_vectors() {
+        for (octets, encoded) in VECTORS {
+            assert_eq!(decode(encoded.as_bytes()).unwrap(), octets.as_bytes());
+        }
+    }
+
+    #[test]
+    fn decode_reads_back_what_encode_into_wrote() {
+        let octets: Vec<u8> = (0..=255).collect();
+
+        for len in 0..octets.len() {
+            let mut encoded = String::new();
+
+            encode_into(&octets[..len], &mut encoded);
+
+            assert_eq!(decode(encoded.as_bytes()).unwrap(), octets[..len]);
+        }
+    }
+
+    #[test]
+    fn decode_reads_the_whole_alphabet() {
+        let mut encoded = String::new();
+
+        for (value, &character) in ALPHABET.iter().enumerate() {
+            assert_eq!(value_of(character), Some(value as u8));
+
+            encoded.push(char::from(character));
+        }
+
+        assert_eq!(decode(encoded.as_bytes()).unwrap().len(), 48);
+    }
+
+    #[test]
+    fn decode_passes_over_whitespace_wherever_it_stands() {
+        for encoded in ["Zm9v", " Zm9v", "Zm 9v", "Zm9v ", "Z\r\nm\t9\x0bv\x0c"] {
+            assert_eq!(decode(encoded.as_bytes()).unwrap(), b"foo");
+        }
+
+        assert_eq!(decode(b"Zm 8 =").unwrap(), b"fo");
+    }
+
+    #[test]
+    fn decode_reads_nothing_as_nothing() {
+        assert_eq!(decode(b"").unwrap(), b"");
+        assert_eq!(decode(b"  ").unwrap(), b"");
+    }
+
+    #[test]
+    fn decode_accepts_a_group_left_unpadded() {
+        assert_eq!(decode(b"Zm8").unwrap(), b"fo");
+        assert_eq!(decode(b"Zg").unwrap(), b"f");
+    }
+
+    #[test]
+    fn decode_refuses_a_character_that_is_not_base_64() {
+        assert_eq!(decode(b"Zm9*"), Err(3));
+        assert_eq!(decode(b"-m9v"), Err(0));
+        assert_eq!(decode(b"Zm9v!"), Err(4));
+    }
+
+    #[test]
+    fn decode_refuses_a_group_of_one_character() {
+        assert_eq!(decode(b"Z"), Err(0));
+        assert_eq!(decode(b"Zm9vZ"), Err(4));
+    }
+
+    #[test]
+    fn decode_refuses_padding_that_stands_for_too_much() {
+        assert_eq!(decode(b"Z==="), Err(1));
+        assert_eq!(decode(b"===="), Err(0));
+        assert_eq!(decode(b"="), Err(0));
+    }
+
+    #[test]
+    fn decode_refuses_padding_that_leaves_its_group_unfilled() {
+        assert_eq!(decode(b"Zg="), Err(3));
+        assert_eq!(decode(b"Zm9vZg="), Err(7));
+    }
+
+    #[test]
+    fn decode_refuses_anything_after_a_padded_group() {
+        assert_eq!(decode(b"Zg==Zg=="), Err(4));
+        assert_eq!(decode(b"Zg==v"), Err(4));
+    }
+
+    #[test]
+    fn decode_refuses_a_character_after_padding_within_a_group() {
+        assert_eq!(decode(b"Zm=v"), Err(3));
+    }
+
+    #[test]
+    fn decode_refuses_bits_an_encoder_would_have_left_zero() {
+        // "Zg==" is "f", and only the four low bits of the second character
+        // may be zero for the encoding to be the one an encoder writes.
+        assert_eq!(decode(b"Zg=="), Ok(b"f".to_vec()));
+        assert_eq!(decode(b"Zh=="), Err(1));
+        assert_eq!(decode(b"Zm8="), Ok(b"fo".to_vec()));
+        assert_eq!(decode(b"Zm9="), Err(2));
+    }
+
+    #[test]
+    fn decode_refuses_the_same_bits_in_a_group_left_unpadded() {
+        assert_eq!(decode(b"Zh"), Err(1));
+        assert_eq!(decode(b"Zm9"), Err(2));
     }
 }

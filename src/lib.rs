@@ -17,6 +17,7 @@
 mod base64;
 mod syntax;
 
+pub mod decode;
 pub mod encode;
 pub mod types;
 

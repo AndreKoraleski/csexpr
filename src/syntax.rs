@@ -8,6 +8,27 @@
 /// in a token alongside letters and digits.
 const PUNCTUATION: &[u8; 8] = b"-./_:*+=";
 
+/// Returns `true` if the octet is whitespace (§3).
+///
+/// §3 counts six characters as whitespace, which are space, horizontal tab,
+/// vertical tab, form feed, carriage return, and line feed. This is not what
+/// [`u8::is_ascii_whitespace`] counts, which leaves out the vertical tab.
+pub(crate) fn is_whitespace(octet: u8) -> bool {
+    matches!(octet, b' ' | 0x09 | 0x0a | 0x0b | 0x0c | 0x0d)
+}
+
+/// Returns what one hexadecimal digit is worth (§4.4).
+pub(crate) fn hex_value(octet: u8) -> Option<u8> {
+    let value = match octet {
+        b'0'..=b'9' => octet - b'0',
+        b'a'..=b'f' => octet - b'a' + 10,
+        b'A'..=b'F' => octet - b'A' + 10,
+        _ => return None,
+    };
+
+    Some(value)
+}
+
 /// Returns `true` if the octet may appear in a token (§4.3).
 pub(crate) fn is_token(octet: u8) -> bool {
     octet.is_ascii_alphanumeric() || PUNCTUATION.contains(&octet)
