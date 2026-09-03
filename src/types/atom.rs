@@ -139,6 +139,21 @@ impl Atom {
     pub fn into_parts(self) -> (Box<[u8]>, Option<Box<[u8]>>) {
         (self.data, self.hint)
     }
+
+    /// Creates an atom from octets the caller already owns.
+    ///
+    /// This is what [`into_parts`] undoes. [`new`] and [`with_hint`] take
+    /// anything that lends octets and so have to copy what they are lent,
+    /// which is the right thing where the octets belong to someone else. A
+    /// caller holding octets of its own, as a reader does once it has decoded
+    /// them, hands them over here instead of having them copied.
+    ///
+    /// [`into_parts`]: Self::into_parts
+    /// [`new`]: Self::new
+    /// [`with_hint`]: Self::with_hint
+    pub fn from_parts(data: Box<[u8]>, hint: Option<Box<[u8]>>) -> Self {
+        Self { data, hint }
+    }
 }
 
 /// Formats the atom for diagnostics, escaping octets outside printable ASCII.
@@ -163,7 +178,7 @@ impl From<&str> for Atom {
 
 impl From<String> for Atom {
     fn from(s: String) -> Self {
-        Self::new(s)
+        Self::from(s.into_bytes())
     }
 }
 
@@ -484,6 +499,47 @@ mod tests {
 
             assert_eq!(rebuilt, atom);
         }
+    }
+
+    // from_parts
+
+    #[test]
+    fn from_parts_undoes_into_parts() {
+        for atom in [
+            Atom::new(DATA),
+            Atom::new(DATA).with_hint(HINT),
+            Atom::new(DATA).with_hint(""),
+            Atom::new("").with_hint(HINT),
+            Atom::new("").with_hint(""),
+            Atom::new(OCTETS).with_hint(OCTETS),
+        ] {
+            let (data, hint) = atom.clone().into_parts();
+
+            assert_eq!(Atom::from_parts(data, hint), atom);
+        }
+    }
+
+    #[test]
+    fn from_parts_builds_what_new_and_with_hint_build() {
+        let data: Box<[u8]> = Box::from(DATA);
+        let hint: Box<[u8]> = Box::from(HINT);
+
+        assert_eq!(Atom::from_parts(data.clone(), None), Atom::new(DATA));
+        assert_eq!(
+            Atom::from_parts(data, Some(hint)),
+            Atom::new(DATA).with_hint(HINT)
+        );
+    }
+
+    #[test]
+    fn from_parts_distinguishes_no_hint_from_a_zero_length_one() {
+        let data: Box<[u8]> = Box::from(DATA);
+        let absent = Atom::from_parts(data.clone(), None);
+        let empty = Atom::from_parts(data, Some(Box::from(&b""[..])));
+
+        assert_ne!(absent, empty);
+        assert_eq!(absent.hint(), None);
+        assert_eq!(empty.hint(), Some(&b""[..]));
     }
 
     // Debug

@@ -154,7 +154,11 @@ impl<'a> Reader<'a> {
                     return Err(self.error(ErrorKind::HintOnList));
                 }
 
-                Ok(Atom::from(self.simple_string()?).with_hint(hint))
+                // The octets are the reader's own, so they are handed over
+                // rather than lent and copied.
+                let data = self.simple_string()?;
+
+                Ok(Atom::from_parts(data.into(), Some(hint.into())))
             }
             None => Ok(Atom::from(self.simple_string()?)),
         }
