@@ -28,6 +28,16 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which one
+      options:
+        - The crate, from crates.io
+        - The package, from PyPI
+    validations:
+      required: true
+
   - type: input
     id: version
     attributes:
@@ -37,10 +47,12 @@ body:
       required: true
 
   - type: input
-    id: rust
+    id: toolchain
     attributes:
-      label: Version of Rust
-      description: The output of `rustc --version`.
+      label: Version of Rust or of Python
+      description: >
+        The output of `rustc --version`, or of `python --version` where the
+        package came from PyPI.
     validations:
       required: true
 

@@ -11,7 +11,10 @@ An initial reply should come within a week.
 
 ## What counts
 
-This crate parses input that an application may have received from anywhere,
+This applies to the crate on crates.io and to the package on PyPI alike, since
+the parsing and the writing are the same code either way.
+
+It parses input that an application may have received from anywhere,
 and RFC 9804 S-expressions carry signed material in SPKI and SDSI, so the
 following are all worth reporting.
 
@@ -31,4 +34,5 @@ that default gives the hazard back, which the documentation says plainly.
 
 ## Supported versions
 
-The latest release is the supported one, while the crate is before 1.0.
+The latest release is the supported one, while this is before 1.0. The crate
+and the package are released together and carry the same version.
