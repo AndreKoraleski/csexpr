@@ -35,6 +35,17 @@ jobs:
         with:
           tool: cargo-fuzz
 
+      # A fuzzer is only as good as the inputs it has already found, and a run
+      # that starts from nothing spends its time rediscovering what the last
+      # one knew. The key changes every run so that each one saves what it
+      # learned, and the prefix restores the most recent of them.
+      - name: Carry the corpus over from the last run
+        uses: actions/cache@v4
+        with:
+          path: fuzz/corpus/${{ matrix.target }}
+          key: fuzz-${{ matrix.target }}-${{ github.run_id }}
+          restore-keys: fuzz-${{ matrix.target }}-
+
       - name: Fuzz
         run: |
           cargo fuzz run ${{ matrix.target }} -- \
