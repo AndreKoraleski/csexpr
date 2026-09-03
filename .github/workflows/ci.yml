@@ -42,7 +42,7 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - name: Clippy
-        run: cargo clippy --all-targets
+        run: cargo clippy --workspace --all-targets
       - name: Documentation
         run: cargo doc --no-deps
         env:
@@ -87,3 +87,50 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Build the package that would be published
         run: cargo package
+
+  python:
+    name: Python bindings on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: bindings/python
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Build the extension and install it
+        run: pip install --editable .
+      - name: Test
+        run: |
+          pip install pytest
+          pytest
+
+  python-lint:
+    name: Python formatting, lints and types
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bindings/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      # The extension has to be built for the types to be checked against it.
+      - name: Build the extension and install it
+        run: pip install --editable . ruff mypy
+      - name: Check formatting
+        run: ruff format --check .
+      - name: Lints
+        run: ruff check .
+      - name: Types
+        run: mypy .
