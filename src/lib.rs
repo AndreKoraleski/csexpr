@@ -15,6 +15,7 @@
 #![warn(missing_docs)]
 
 mod base64;
+mod syntax;
 
 pub mod encode;
 pub mod types;

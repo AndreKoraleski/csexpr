@@ -10,5 +10,6 @@
 //! Every writer here works iteratively, so writing an S-expression consumes no
 //! stack in proportion to how deeply its lists nest.
 
+pub mod advanced;
 pub mod canonical;
 pub mod transport;
