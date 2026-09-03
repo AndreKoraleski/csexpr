@@ -8,8 +8,15 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Everything that guards a push to master, run again against the tag. A
+  # release is published only if the whole of it passes, so a red master
+  # cannot become a green release.
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
   check:
-    name: Check the tag and the tests
+    name: Check the tag
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -45,15 +52,9 @@ jobs:
             exit 1
           fi
 
-      - name: Test
-        run: cargo test --all-targets
-
-      - name: Test the examples in the documentation
-        run: cargo test --doc
-
   crate:
     name: Publish to crates.io
-    needs: check
+    needs: [check, ci]
     runs-on: ubuntu-latest
     environment: crates-io
     permissions:
@@ -95,7 +96,7 @@ jobs:
 
   wheels:
     name: Build wheels on ${{ matrix.os }}
-    needs: check
+    needs: [check, ci]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -119,7 +120,7 @@ jobs:
 
   sdist:
     name: Build the source distribution
-    needs: check
+    needs: [check, ci]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

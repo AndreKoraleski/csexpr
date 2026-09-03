@@ -5,6 +5,9 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # A release calls this, so that what gets published is what passed here
+  # rather than something that merely resembles it.
+  workflow_call:
 
 env:
   CARGO_TERM_COLOR: always
