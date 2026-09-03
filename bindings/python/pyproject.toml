@@ -1,0 +1,80 @@
+[build-system]
+requires = ["maturin>=1.9,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "csexpr"
+description = "S-expressions as specified by RFC 9804"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "AndreKoraleski" }]
+keywords = ["sexp", "s-expression", "rfc9804", "csexp", "spki"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Rust",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Security :: Cryptography",
+  "Typing :: Typed",
+]
+# maturin reads it from Cargo.toml, so the two cannot drift apart.
+dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/AndreKoraleski/csexpr"
+Changelog = "https://github.com/AndreKoraleski/csexpr/blob/master/CHANGELOG.md"
+Issues = "https://github.com/AndreKoraleski/csexpr/issues"
+
+[tool.maturin]
+module-name = "csexpr._csexpr"
+python-source = "python"
+features = ["pyo3/extension-module"]
+
+[dependency-groups]
+dev = ["maturin>=1.9,<2.0", "mypy>=1.11", "pytest>=8.0", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+# The Rust side wraps its prose at eighty columns, and prose reads the same in
+# either language.
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+  "ANN", # everything is annotated
+  "B",   # bugbear
+  "D",   # everything public is documented
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "I",   # imports in order
+  "N",   # names as PEP 8 spells them
+  "PT",  # tests written the way pytest reads them
+  "PYI", # stubs written the way a type checker reads them
+  "RUF",
+  "S",   # what bandit would say
+  "SIM",
+  "TID",
+  "UP",
+  "W",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+# A test says what it tests in its name, as the Rust tests do, and asserting
+# is what it is for.
+"tests/*" = ["D100", "D103", "S101"]
+# PYI021 asks for stubs without docstrings. These are kept, since an editor
+# reads them from here long before it reads anything else.
+"*.pyi" = ["PYI021"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["python", "tests"]
+strict = true

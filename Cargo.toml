@@ -13,3 +13,10 @@ readme = "README.md"
 exclude = [".github", "bindings", "fuzz", "mutants.toml"]
 
 [dependencies]
+
+# The library itself has no dependencies. The bindings that carry it to other
+# languages do, and each is a member of its own, built only when asked for.
+[workspace]
+members = ["bindings/python"]
+default-members = ["."]
+resolver = "3"
